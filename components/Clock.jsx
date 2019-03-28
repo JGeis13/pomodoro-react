@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import Settings from './Settings'
-import Timer from '../accurateInterval'
+import Timer from '../functions/accurateInterval'
 
 export default class Clock extends Component {
   constructor(props){

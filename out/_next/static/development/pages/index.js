@@ -1,46 +1,5 @@
 ((window["webpackJsonp"] = window["webpackJsonp"] || []).push([["static/development/pages/index.js"],{
 
-/***/ "./accurateInterval.js":
-/*!*****************************!*\
-  !*** ./accurateInterval.js ***!
-  \*****************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/*
-  Accurate_Interval.js by Squeege and modified by Peter Weinberg
-  https://codepen.io/no_stack_dub_sack/pen/VKJGKd?editors=1010 
-*/
-var Timer = new Object();
-
-Timer.accurateInterval = function (fn, time) {
-  var cancel, nextAt, timeout, _wrapper;
-
-  nextAt = new Date().getTime() + time;
-  timeout = null;
-
-  _wrapper = function wrapper() {
-    nextAt += time;
-    timeout = setTimeout(_wrapper, nextAt - new Date().getTime());
-    return fn();
-  };
-
-  cancel = function cancel() {
-    return clearTimeout(timeout);
-  };
-
-  timeout = setTimeout(_wrapper, nextAt - new Date().getTime());
-  return {
-    cancel: cancel
-  };
-};
-
-/* harmony default export */ __webpack_exports__["default"] = (Timer);
-
-/***/ }),
-
 /***/ "./components/Clock.jsx":
 /*!******************************!*\
   !*** ./components/Clock.jsx ***!
@@ -61,7 +20,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_6__);
 /* harmony import */ var _Settings__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Settings */ "./components/Settings.jsx");
-/* harmony import */ var _accurateInterval__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../accurateInterval */ "./accurateInterval.js");
+/* harmony import */ var _functions_accurateInterval__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../functions/accurateInterval */ "./functions/accurateInterval.js");
 
 
 
@@ -163,7 +122,7 @@ function (_Component) {
         };
       }); //this.timer = setInterval(this.tick, 200);
 
-      this.state.timer = _accurateInterval__WEBPACK_IMPORTED_MODULE_8__["default"].accurateInterval(this.tick, 1000);
+      this.state.timer = _functions_accurateInterval__WEBPACK_IMPORTED_MODULE_8__["default"].accurateInterval(this.tick, 1000);
     }
   }, {
     key: "handleSettingsChange",
@@ -210,7 +169,7 @@ function (_Component) {
         this.setState({
           isActive: true
         });
-        this.state.timer = _accurateInterval__WEBPACK_IMPORTED_MODULE_8__["default"].accurateInterval(this.tick, 1000);
+        this.state.timer = _functions_accurateInterval__WEBPACK_IMPORTED_MODULE_8__["default"].accurateInterval(this.tick, 1000);
       }
     }
   }, {
@@ -531,6 +490,47 @@ function TypeSettings(props) {
     __self: this
   })));
 }
+
+/***/ }),
+
+/***/ "./functions/accurateInterval.js":
+/*!***************************************!*\
+  !*** ./functions/accurateInterval.js ***!
+  \***************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/*
+  Accurate_Interval.js by Squeege and modified by Peter Weinberg
+  https://codepen.io/no_stack_dub_sack/pen/VKJGKd?editors=1010 
+*/
+var Timer = new Object();
+
+Timer.accurateInterval = function (fn, time) {
+  var cancel, nextAt, timeout, _wrapper;
+
+  nextAt = new Date().getTime() + time;
+  timeout = null;
+
+  _wrapper = function wrapper() {
+    nextAt += time;
+    timeout = setTimeout(_wrapper, nextAt - new Date().getTime());
+    return fn();
+  };
+
+  cancel = function cancel() {
+    return clearTimeout(timeout);
+  };
+
+  timeout = setTimeout(_wrapper, nextAt - new Date().getTime());
+  return {
+    cancel: cancel
+  };
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (Timer);
 
 /***/ }),
 
