@@ -1,0 +1,161 @@
+:root {
+  --primary-color: #324D5C;
+  --secondary-color: #14B278;
+  --tertiary-color: white; }
+
+* {
+  font-family: 'IBM Plex Sans', sans-serif; }
+
+#root {
+  background: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  position: relative;
+  overflow: hidden; }
+
+#clock h2 {
+  position: absolute;
+  left: 2rem;
+  top: 0;
+  color: var(--secondary-color);
+  font-weight: 500; }
+
+#settings {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  top: 0;
+  right: 0;
+  width: 310px;
+  height: 100%;
+  border-left: 1px solid var(--tertiary-color);
+  background: var(--secondary-color);
+  color: var(--tertiary-color);
+  z-index: 1;
+  transition: transform 0.3s; }
+  #settings .material-icons {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: var(--secondary-color);
+    transition: transform .3s, color .3s;
+    cursor: pointer;
+    transform: translateX(-311px) rotate(360deg); }
+  #settings .type-settings {
+    margin-top: 4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center; }
+    #settings .type-settings label {
+      text-transform: capitalize;
+      font-size: 1.4rem;
+      font-weight: 200;
+      padding: 1rem 0; }
+    #settings .type-settings .inc-dec {
+      display: flex;
+      justify-content: center; }
+      #settings .type-settings .inc-dec * {
+        display: inline; }
+      #settings .type-settings .inc-dec div {
+        font-size: 2.4rem;
+        text-align: center;
+        line-height: 60px;
+        width: 80px; }
+    #settings .type-settings .btn {
+      border-color: var(--tertiary-color);
+      color: var(--tertiary-color);
+      font-size: 3rem;
+      padding-bottom: 20px;
+      margin: 0 5px;
+      cursor: pointer; }
+  #settings #reset {
+    margin-top: 5rem;
+    width: 210px;
+    outline: none;
+    background: none;
+    border: 1px solid var(--tertiary-color);
+    color: var(--tertiary-color);
+    font-weight: 200;
+    font-size: 1.5rem;
+    padding: 12px 10px;
+    border-radius: 50px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    cursor: pointer; }
+
+#main {
+  display: flex;
+  flex-direction: column;
+  border: 3px solid var(--secondary-color);
+  border-radius: 50%;
+  height: 300px;
+  width: 300px;
+  align-items: center;
+  justify-content: center; }
+  #main .circleDisplay {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    justify-self: center; }
+    #main .circleDisplay label {
+      color: var(--secondary-color); }
+    #main .circleDisplay #timer-label {
+      font-size: 2rem;
+      text-transform: capitalize;
+      font-weight: 200; }
+    #main .circleDisplay #time-left {
+      font-size: 5.5rem;
+      padding: 1rem 0;
+      font-weight: 500; }
+
+.controls {
+  text-align: center;
+  margin-top: 1rem; }
+
+i {
+  vertical-align: middle;
+  color: var(--secondary-color);
+  cursor: pointer; }
+  i:focus {
+    outline: none; }
+
+.btn {
+  height: 60px;
+  width: 60px;
+  background: none;
+  padding: 0;
+  border-radius: 50%;
+  margin: 0 0.8rem;
+  border: 1px solid var(--secondary-color); }
+  .btn i {
+    font-size: 2rem; }
+  .btn:focus {
+    outline: none; }
+
+.btn-main {
+  height: 80px;
+  width: 80px; }
+  .btn-main i {
+    font-size: 4rem; }
+
+.credits {
+  width: 100%;
+  text-align: center;
+  font-family: 'IBM Plex Mono', monospace;
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  font-size: 0.8rem;
+  color: var(--tertiary-color); }
+
+.closed {
+  transform: translateX(311px); }
+
+html, body {
+  margin: 0;
+  padding: 0; }
+
