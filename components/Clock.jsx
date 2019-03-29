@@ -1,11 +1,15 @@
 import React, {Component} from 'react'
 import Settings from './Settings'
-import Timer from '../functions/accurateInterval'
+import accurateInterval from '../functions/accurateInterval'
+import ModalButton from './ModalButton'
+import Modal from './Modal'
 
 export default class Clock extends Component {
+  // persist timer using local storage
+  // since using Date as timer, can it keep 'running' when app is closed? 
   constructor(props){
     super(props);
-    this.defaultVals = [5, 25]; // 5, 25
+    this.defaultVals = [5, 25, 1];
     this.state = {
       breakTime: this.defaultVals[0],
       sessionTime: this.defaultVals[1],
@@ -14,26 +18,18 @@ export default class Clock extends Component {
       start: null,
       timer: '',
       isActive: false,
+      speed: 1,
+      devMode: true
     }
-    this.bindThis();
+
   }
   // Lifecycle Hooks
-  componentDidMount(){
-    //this.timer = setInterval(this.tick, 200);
-  }
+
   componentWillUnmout(){
     this.state.timer.cancel();
   }
-  //
-  bindThis(){
-    this.startStop = this.startStop.bind(this);
-    this.reset = this.reset.bind(this);
-    this.getInfo = this.getInfo.bind(this);
-    this.tick = this.tick.bind(this);
-    this.handleSettingsChange = this.handleSettingsChange.bind(this);
-    this.restart = this.restart.bind(this);
-  }
-  tick(){
+
+  tick = () => {
     let newTime = this.state.displayTime - 1;
     this.setState({
       displayTime: newTime,
@@ -42,6 +38,7 @@ export default class Clock extends Component {
     if(newTime == 0) document.querySelector('#beep').play();
     if(newTime < 0) return this.switchModes();
   }
+
   toggleSettings(e){
     let btn = e.target;
     let bool = btn.parentNode.classList.toggle('closed');
@@ -56,7 +53,8 @@ export default class Clock extends Component {
       btn.style.color = 'var(--tertiary-color)';
     }
   }
-  switchModes(){
+
+  switchModes = () => {
     this.state.timer.cancel();
     let newType = this.state.currentType == 'session' ? 'break' : 'session';
     this.setState( prevState => ({
@@ -65,12 +63,12 @@ export default class Clock extends Component {
       start: Date.now(),
       isActive: true,
     }));
-    //this.timer = setInterval(this.tick, 200);
-    this.state.timer = Timer.accurateInterval( this.tick, 1000);
+    this.state.timer = accurateInterval( this.tick, 1000/this.state.speed);
   }
-  handleSettingsChange(typeStr, operation){
-    if(this.state.isActive) return;
-    let s = this.state.sessionTime, b = this.state.breakTime;
+
+  handleSettingsChange = (typeStr, operation) => {
+    if(this.state.isActive) return; // change to allow adjustments while active
+    let s = this.state.sessionTime, b = this.state.breakTime, spe = this.state.speed
     if(typeStr == 'session'){
       if(operation == '-') s--;
       else if(operation == '+') s++;
@@ -82,6 +80,11 @@ export default class Clock extends Component {
       else if(operation == '+') b++;
       if(b > 60 || b < 1) return;
       this.setState({breakTime: b});
+    } else if(typeStr == 'speed'){
+      if(operation == '-') spe--;
+      else if(operation == '+') spe++;
+      if(spe > 10 || spe < 1) return;
+      this.setState({speed: spe})
     }
     if(this.state.currentType == 'session'){
       this.setState({
@@ -94,7 +97,8 @@ export default class Clock extends Component {
       });
     }
   }
-  startStop(e){
+
+  startStop = (e) => {
     if(this.state.isActive){
       document.querySelector('#start_stop i').innerText = 'play_arrow';
       this.state.timer.cancel();
@@ -105,10 +109,11 @@ export default class Clock extends Component {
       this.setState({
         isActive: true,
       });
-      this.state.timer = Timer.accurateInterval(this.tick, 1000);
+      this.state.timer = accurateInterval(this.tick, 1000/this.state.speed);
     }
   }
-  reset(){
+
+  reset = () => {
     if(this.state.timer != '') this.state.timer.cancel();
     this.setState({
       breakTime: this.defaultVals[0],
@@ -117,11 +122,13 @@ export default class Clock extends Component {
       displayTime: this.defaultVals[1] * 60,
       start: null,
       isActive: false,
+      speed: this.defaultVals[2]
     });
     document.querySelector('#beep').pause();
     document.querySelector('#beep').currentTime = 0;
   }
-  restart(){
+
+  restart = () => {
     this.state.timer.cancel();
     document.querySelector('#start_stop i').innerText = 'play_arrow';
     this.setState({
@@ -130,15 +137,20 @@ export default class Clock extends Component {
       isActive: false,
     });
   }
-  getInfo(){
-    console.log(this.state.start);
-  }
-  formatDisplayTime(){
+
+  formatDisplayTime = () => {
     let mins = Math.floor(this.state.displayTime / 60);
     let secs = this.state.displayTime % 60;
     if(mins < 10 ) mins = '0' + mins.toString();
     if(secs < 10) secs = '0' + secs.toString();
     return mins + ':' + secs;
+  }
+
+  toggleDevMode = () => {
+    console.log('toggling')
+    this.setState(prevState => (
+      {devMode: !prevState.devMode}
+    ))
   }
 
   render(){
@@ -151,12 +163,15 @@ export default class Clock extends Component {
           settingsChange={this.handleSettingsChange}
           reset={this.reset}
           toggleShow={this.toggleSettings}
+          speed={this.state.speed}
+          devMode={this.state.devMode}
+          toggleMode={this.toggleDevMode}
           />
         <div id='main'>
           <div className='circleDisplay'>
             <label id='timer-label'>{this.state.currentType}</label>
             <label id='time-left'>{this.formatDisplayTime()}</label>
-            <audio id='beep'><source src='http://soundbible.com/mp3/Electronic_Chime-KevanGC-495939803.mp3' type='audio/mpeg' /></audio>
+            <audio id='beep'><source src='https://soundbible.com/mp3/Electronic_Chime-KevanGC-495939803.mp3' type='audio/mpeg' /></audio>
           </div>
         </div>
         <div className='controls'>
@@ -166,9 +181,8 @@ export default class Clock extends Component {
           <button className='btn btn-main' onClick={this.startStop} id='start_stop'>
             <i className="material-icons">play_arrow</i>
           </button>
-          <button className='btn' onClick={this.getInfo} id='info'>
-            <i className="material-icons">info</i>
-          </button>
+          <ModalButton />
+          <Modal />
         </div>
         <div className='credits'>
           Created by Jarick Geiselmayr
@@ -177,3 +191,7 @@ export default class Clock extends Component {
     );
   }
 }
+
+// TODOs
+// persist timer using local storage
+  // since using Date as timer, can it keep 'running' when app is closed? 
