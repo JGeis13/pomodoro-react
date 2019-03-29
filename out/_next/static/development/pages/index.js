@@ -16,11 +16,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_corejs2_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime-corejs2/helpers/esm/createClass */ "./node_modules/@babel/runtime-corejs2/helpers/esm/createClass.js");
 /* harmony import */ var _babel_runtime_corejs2_helpers_esm_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime-corejs2/helpers/esm/possibleConstructorReturn */ "./node_modules/@babel/runtime-corejs2/helpers/esm/possibleConstructorReturn.js");
 /* harmony import */ var _babel_runtime_corejs2_helpers_esm_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime-corejs2/helpers/esm/getPrototypeOf */ "./node_modules/@babel/runtime-corejs2/helpers/esm/getPrototypeOf.js");
-/* harmony import */ var _babel_runtime_corejs2_helpers_esm_inherits__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @babel/runtime-corejs2/helpers/esm/inherits */ "./node_modules/@babel/runtime-corejs2/helpers/esm/inherits.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var _Settings__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Settings */ "./components/Settings.jsx");
-/* harmony import */ var _functions_accurateInterval__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../functions/accurateInterval */ "./functions/accurateInterval.js");
+/* harmony import */ var _babel_runtime_corejs2_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @babel/runtime-corejs2/helpers/esm/assertThisInitialized */ "./node_modules/@babel/runtime-corejs2/helpers/esm/assertThisInitialized.js");
+/* harmony import */ var _babel_runtime_corejs2_helpers_esm_inherits__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @babel/runtime-corejs2/helpers/esm/inherits */ "./node_modules/@babel/runtime-corejs2/helpers/esm/inherits.js");
+/* harmony import */ var _babel_runtime_corejs2_helpers_esm_defineProperty__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @babel/runtime-corejs2/helpers/esm/defineProperty */ "./node_modules/@babel/runtime-corejs2/helpers/esm/defineProperty.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var _Settings__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./Settings */ "./components/Settings.jsx");
+/* harmony import */ var _functions_accurateInterval__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../functions/accurateInterval */ "./functions/accurateInterval.js");
+/* harmony import */ var _ModalButton__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./ModalButton */ "./components/ModalButton.jsx");
+/* harmony import */ var _Modal__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./Modal */ "./components/Modal.jsx");
+
+
 
 
 
@@ -32,19 +38,160 @@ var _jsxFileName = "/Users/jarickg/DevProjects/Sandbox/pomodoro-react/components
 
 
 
+
+
 var Clock =
 /*#__PURE__*/
 function (_Component) {
-  Object(_babel_runtime_corejs2_helpers_esm_inherits__WEBPACK_IMPORTED_MODULE_5__["default"])(Clock, _Component);
+  Object(_babel_runtime_corejs2_helpers_esm_inherits__WEBPACK_IMPORTED_MODULE_6__["default"])(Clock, _Component);
 
+  // persist timer using local storage
+  // since using Date as timer, can it keep 'running' when app is closed? 
   function Clock(props) {
     var _this;
 
     Object(_babel_runtime_corejs2_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_1__["default"])(this, Clock);
 
     _this = Object(_babel_runtime_corejs2_helpers_esm_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3__["default"])(this, Object(_babel_runtime_corejs2_helpers_esm_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4__["default"])(Clock).call(this, props));
-    _this.defaultVals = [5, 25]; // 5, 25
 
+    Object(_babel_runtime_corejs2_helpers_esm_defineProperty__WEBPACK_IMPORTED_MODULE_7__["default"])(Object(_babel_runtime_corejs2_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_5__["default"])(_this), "tick", function () {
+      var newTime = _this.state.displayTime - 1;
+
+      _this.setState({
+        displayTime: newTime
+      }); // !! Handle end of timer
+
+
+      if (newTime == 0) document.querySelector('#beep').play();
+      if (newTime < 0) return _this.switchModes();
+    });
+
+    Object(_babel_runtime_corejs2_helpers_esm_defineProperty__WEBPACK_IMPORTED_MODULE_7__["default"])(Object(_babel_runtime_corejs2_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_5__["default"])(_this), "switchModes", function () {
+      _this.state.timer.cancel();
+
+      var newType = _this.state.currentType == 'session' ? 'break' : 'session';
+
+      _this.setState(function (prevState) {
+        return {
+          currentType: newType,
+          displayTime: prevState[newType + 'Time'] * 60,
+          start: _babel_runtime_corejs2_core_js_date_now__WEBPACK_IMPORTED_MODULE_0___default()(),
+          isActive: true
+        };
+      });
+
+      _this.state.timer = Object(_functions_accurateInterval__WEBPACK_IMPORTED_MODULE_10__["default"])(_this.tick, 1000 / _this.state.speed);
+    });
+
+    Object(_babel_runtime_corejs2_helpers_esm_defineProperty__WEBPACK_IMPORTED_MODULE_7__["default"])(Object(_babel_runtime_corejs2_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_5__["default"])(_this), "handleSettingsChange", function (typeStr, operation) {
+      if (_this.state.isActive) return; // change to allow adjustments while active
+
+      var s = _this.state.sessionTime,
+          b = _this.state.breakTime,
+          spe = _this.state.speed;
+
+      if (typeStr == 'session') {
+        if (operation == '-') s--;else if (operation == '+') s++;
+        if (s > 60 || s < 1) return;
+
+        _this.setState({
+          sessionTime: s
+        });
+      } else if (typeStr == 'break') {
+        if (operation == '-') b--;else if (operation == '+') b++;
+        if (b > 60 || b < 1) return;
+
+        _this.setState({
+          breakTime: b
+        });
+      } else if (typeStr == 'speed') {
+        if (operation == '-') spe--;else if (operation == '+') spe++;
+        if (spe > 10 || spe < 1) return;
+
+        _this.setState({
+          speed: spe
+        });
+      }
+
+      if (_this.state.currentType == 'session') {
+        _this.setState({
+          displayTime: s * 60
+        });
+      } else if (_this.state.currentType == 'break') {
+        _this.setState({
+          displayTime: b * 60
+        });
+      }
+    });
+
+    Object(_babel_runtime_corejs2_helpers_esm_defineProperty__WEBPACK_IMPORTED_MODULE_7__["default"])(Object(_babel_runtime_corejs2_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_5__["default"])(_this), "startStop", function (e) {
+      if (_this.state.isActive) {
+        document.querySelector('#start_stop i').innerText = 'play_arrow';
+
+        _this.state.timer.cancel();
+
+        _this.setState({
+          isActive: false
+        });
+      } else {
+        document.querySelector('#start_stop i').innerText = 'pause';
+
+        _this.setState({
+          isActive: true
+        });
+
+        _this.state.timer = Object(_functions_accurateInterval__WEBPACK_IMPORTED_MODULE_10__["default"])(_this.tick, 1000 / _this.state.speed);
+      }
+    });
+
+    Object(_babel_runtime_corejs2_helpers_esm_defineProperty__WEBPACK_IMPORTED_MODULE_7__["default"])(Object(_babel_runtime_corejs2_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_5__["default"])(_this), "reset", function () {
+      if (_this.state.timer != '') _this.state.timer.cancel();
+
+      _this.setState({
+        breakTime: _this.defaultVals[0],
+        sessionTime: _this.defaultVals[1],
+        currentType: 'session',
+        displayTime: _this.defaultVals[1] * 60,
+        start: null,
+        isActive: false,
+        speed: _this.defaultVals[2]
+      });
+
+      document.querySelector('#beep').pause();
+      document.querySelector('#beep').currentTime = 0;
+    });
+
+    Object(_babel_runtime_corejs2_helpers_esm_defineProperty__WEBPACK_IMPORTED_MODULE_7__["default"])(Object(_babel_runtime_corejs2_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_5__["default"])(_this), "restart", function () {
+      _this.state.timer.cancel();
+
+      document.querySelector('#start_stop i').innerText = 'play_arrow';
+
+      _this.setState({
+        displayTime: _this.state[_this.state.currentType + 'Time'] * 60,
+        start: null,
+        isActive: false
+      });
+    });
+
+    Object(_babel_runtime_corejs2_helpers_esm_defineProperty__WEBPACK_IMPORTED_MODULE_7__["default"])(Object(_babel_runtime_corejs2_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_5__["default"])(_this), "formatDisplayTime", function () {
+      var mins = Math.floor(_this.state.displayTime / 60);
+      var secs = _this.state.displayTime % 60;
+      if (mins < 10) mins = '0' + mins.toString();
+      if (secs < 10) secs = '0' + secs.toString();
+      return mins + ':' + secs;
+    });
+
+    Object(_babel_runtime_corejs2_helpers_esm_defineProperty__WEBPACK_IMPORTED_MODULE_7__["default"])(Object(_babel_runtime_corejs2_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_5__["default"])(_this), "toggleDevMode", function () {
+      console.log('toggling');
+
+      _this.setState(function (prevState) {
+        return {
+          devMode: !prevState.devMode
+        };
+      });
+    });
+
+    _this.defaultVals = [5, 25, 1];
     _this.state = {
       breakTime: _this.defaultVals[0],
       sessionTime: _this.defaultVals[1],
@@ -52,45 +199,18 @@ function (_Component) {
       displayTime: _this.defaultVals[1] * 60,
       start: null,
       timer: '',
-      isActive: false
+      isActive: false,
+      speed: 1,
+      devMode: true
     };
-
-    _this.bindThis();
-
     return _this;
   } // Lifecycle Hooks
 
 
   Object(_babel_runtime_corejs2_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_2__["default"])(Clock, [{
-    key: "componentDidMount",
-    value: function componentDidMount() {//this.timer = setInterval(this.tick, 200);
-    }
-  }, {
     key: "componentWillUnmout",
     value: function componentWillUnmout() {
       this.state.timer.cancel();
-    } //
-
-  }, {
-    key: "bindThis",
-    value: function bindThis() {
-      this.startStop = this.startStop.bind(this);
-      this.reset = this.reset.bind(this);
-      this.getInfo = this.getInfo.bind(this);
-      this.tick = this.tick.bind(this);
-      this.handleSettingsChange = this.handleSettingsChange.bind(this);
-      this.restart = this.restart.bind(this);
-    }
-  }, {
-    key: "tick",
-    value: function tick() {
-      var newTime = this.state.displayTime - 1;
-      this.setState({
-        displayTime: newTime
-      }); // !! Handle end of timer
-
-      if (newTime == 0) document.querySelector('#beep').play();
-      if (newTime < 0) return this.switchModes();
     }
   }, {
     key: "toggleSettings",
@@ -109,239 +229,134 @@ function (_Component) {
       }
     }
   }, {
-    key: "switchModes",
-    value: function switchModes() {
-      this.state.timer.cancel();
-      var newType = this.state.currentType == 'session' ? 'break' : 'session';
-      this.setState(function (prevState) {
-        return {
-          currentType: newType,
-          displayTime: prevState[newType + 'Time'] * 60,
-          start: _babel_runtime_corejs2_core_js_date_now__WEBPACK_IMPORTED_MODULE_0___default()(),
-          isActive: true
-        };
-      }); //this.timer = setInterval(this.tick, 200);
-
-      this.state.timer = _functions_accurateInterval__WEBPACK_IMPORTED_MODULE_8__["default"].accurateInterval(this.tick, 1000);
-    }
-  }, {
-    key: "handleSettingsChange",
-    value: function handleSettingsChange(typeStr, operation) {
-      if (this.state.isActive) return;
-      var s = this.state.sessionTime,
-          b = this.state.breakTime;
-
-      if (typeStr == 'session') {
-        if (operation == '-') s--;else if (operation == '+') s++;
-        if (s > 60 || s < 1) return;
-        this.setState({
-          sessionTime: s
-        });
-      } else if (typeStr == 'break') {
-        if (operation == '-') b--;else if (operation == '+') b++;
-        if (b > 60 || b < 1) return;
-        this.setState({
-          breakTime: b
-        });
-      }
-
-      if (this.state.currentType == 'session') {
-        this.setState({
-          displayTime: s * 60
-        });
-      } else if (this.state.currentType == 'break') {
-        this.setState({
-          displayTime: b * 60
-        });
-      }
-    }
-  }, {
-    key: "startStop",
-    value: function startStop(e) {
-      if (this.state.isActive) {
-        document.querySelector('#start_stop i').innerText = 'play_arrow';
-        this.state.timer.cancel();
-        this.setState({
-          isActive: false
-        });
-      } else {
-        document.querySelector('#start_stop i').innerText = 'pause';
-        this.setState({
-          isActive: true
-        });
-        this.state.timer = _functions_accurateInterval__WEBPACK_IMPORTED_MODULE_8__["default"].accurateInterval(this.tick, 1000);
-      }
-    }
-  }, {
-    key: "reset",
-    value: function reset() {
-      if (this.state.timer != '') this.state.timer.cancel();
-      this.setState({
-        breakTime: this.defaultVals[0],
-        sessionTime: this.defaultVals[1],
-        currentType: 'session',
-        displayTime: this.defaultVals[1] * 60,
-        start: null,
-        isActive: false
-      });
-      document.querySelector('#beep').pause();
-      document.querySelector('#beep').currentTime = 0;
-    }
-  }, {
-    key: "restart",
-    value: function restart() {
-      this.state.timer.cancel();
-      document.querySelector('#start_stop i').innerText = 'play_arrow';
-      this.setState({
-        displayTime: this.state[this.state.currentType + 'Time'] * 60,
-        start: null,
-        isActive: false
-      });
-    }
-  }, {
-    key: "getInfo",
-    value: function getInfo() {
-      console.log(this.state.start);
-    }
-  }, {
-    key: "formatDisplayTime",
-    value: function formatDisplayTime() {
-      var mins = Math.floor(this.state.displayTime / 60);
-      var secs = this.state.displayTime % 60;
-      if (mins < 10) mins = '0' + mins.toString();
-      if (secs < 10) secs = '0' + secs.toString();
-      return mins + ':' + secs;
-    }
-  }, {
     key: "render",
     value: function render() {
-      return react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement("div", {
+      return react__WEBPACK_IMPORTED_MODULE_8___default.a.createElement("div", {
         id: "clock",
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 146
-        },
-        __self: this
-      }, react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement("h2", {
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 147
-        },
-        __self: this
-      }, "Pomodoro Clock"), react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement(_Settings__WEBPACK_IMPORTED_MODULE_7__["default"], {
-        breakTime: this.state.breakTime,
-        sessionTime: this.state.sessionTime,
-        settingsChange: this.handleSettingsChange,
-        reset: this.reset,
-        toggleShow: this.toggleSettings,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 148
-        },
-        __self: this
-      }), react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement("div", {
-        id: "main",
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 155
-        },
-        __self: this
-      }, react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement("div", {
-        className: "circleDisplay",
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 156
-        },
-        __self: this
-      }, react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement("label", {
-        id: "timer-label",
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 157
-        },
-        __self: this
-      }, this.state.currentType), react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement("label", {
-        id: "time-left",
         __source: {
           fileName: _jsxFileName,
           lineNumber: 158
         },
         __self: this
-      }, this.formatDisplayTime()), react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement("audio", {
-        id: "beep",
+      }, react__WEBPACK_IMPORTED_MODULE_8___default.a.createElement("h2", {
         __source: {
           fileName: _jsxFileName,
           lineNumber: 159
         },
         __self: this
-      }, react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement("source", {
-        src: "http://soundbible.com/mp3/Electronic_Chime-KevanGC-495939803.mp3",
-        type: "audio/mpeg",
+      }, "Pomodoro Clock"), react__WEBPACK_IMPORTED_MODULE_8___default.a.createElement(_Settings__WEBPACK_IMPORTED_MODULE_9__["default"], {
+        breakTime: this.state.breakTime,
+        sessionTime: this.state.sessionTime,
+        settingsChange: this.handleSettingsChange,
+        reset: this.reset,
+        toggleShow: this.toggleSettings,
+        speed: this.state.speed,
+        devMode: this.state.devMode,
+        toggleMode: this.toggleDevMode,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 159
+          lineNumber: 160
         },
         __self: this
-      })))), react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement("div", {
-        className: "controls",
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 162
-        },
-        __self: this
-      }, react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement("button", {
-        className: "btn",
-        onClick: this.restart,
-        id: "restart",
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 163
-        },
-        __self: this
-      }, react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement("i", {
-        className: "material-icons",
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 164
-        },
-        __self: this
-      }, "replay")), react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement("button", {
-        className: "btn btn-main",
-        onClick: this.startStop,
-        id: "start_stop",
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 166
-        },
-        __self: this
-      }, react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement("i", {
-        className: "material-icons",
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 167
-        },
-        __self: this
-      }, "play_arrow")), react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement("button", {
-        className: "btn",
-        onClick: this.getInfo,
-        id: "info",
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 169
-        },
-        __self: this
-      }, react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement("i", {
-        className: "material-icons",
+      }), react__WEBPACK_IMPORTED_MODULE_8___default.a.createElement("div", {
+        id: "main",
         __source: {
           fileName: _jsxFileName,
           lineNumber: 170
         },
         __self: this
-      }, "info"))), react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement("div", {
-        className: "credits",
+      }, react__WEBPACK_IMPORTED_MODULE_8___default.a.createElement("div", {
+        className: "circleDisplay",
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 171
+        },
+        __self: this
+      }, react__WEBPACK_IMPORTED_MODULE_8___default.a.createElement("label", {
+        id: "timer-label",
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 172
+        },
+        __self: this
+      }, this.state.currentType), react__WEBPACK_IMPORTED_MODULE_8___default.a.createElement("label", {
+        id: "time-left",
         __source: {
           fileName: _jsxFileName,
           lineNumber: 173
+        },
+        __self: this
+      }, this.formatDisplayTime()), react__WEBPACK_IMPORTED_MODULE_8___default.a.createElement("audio", {
+        id: "beep",
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 174
+        },
+        __self: this
+      }, react__WEBPACK_IMPORTED_MODULE_8___default.a.createElement("source", {
+        src: "https://soundbible.com/mp3/Electronic_Chime-KevanGC-495939803.mp3",
+        type: "audio/mpeg",
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 174
+        },
+        __self: this
+      })))), react__WEBPACK_IMPORTED_MODULE_8___default.a.createElement("div", {
+        className: "controls",
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 177
+        },
+        __self: this
+      }, react__WEBPACK_IMPORTED_MODULE_8___default.a.createElement("button", {
+        className: "btn",
+        onClick: this.restart,
+        id: "restart",
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 178
+        },
+        __self: this
+      }, react__WEBPACK_IMPORTED_MODULE_8___default.a.createElement("i", {
+        className: "material-icons",
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 179
+        },
+        __self: this
+      }, "replay")), react__WEBPACK_IMPORTED_MODULE_8___default.a.createElement("button", {
+        className: "btn btn-main",
+        onClick: this.startStop,
+        id: "start_stop",
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 181
+        },
+        __self: this
+      }, react__WEBPACK_IMPORTED_MODULE_8___default.a.createElement("i", {
+        className: "material-icons",
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 182
+        },
+        __self: this
+      }, "play_arrow")), react__WEBPACK_IMPORTED_MODULE_8___default.a.createElement(_ModalButton__WEBPACK_IMPORTED_MODULE_11__["default"], {
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 184
+        },
+        __self: this
+      }), react__WEBPACK_IMPORTED_MODULE_8___default.a.createElement(_Modal__WEBPACK_IMPORTED_MODULE_12__["default"], {
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 185
+        },
+        __self: this
+      })), react__WEBPACK_IMPORTED_MODULE_8___default.a.createElement("div", {
+        className: "credits",
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 187
         },
         __self: this
       }, "Created by Jarick Geiselmayr"));
@@ -349,9 +364,128 @@ function (_Component) {
   }]);
 
   return Clock;
-}(react__WEBPACK_IMPORTED_MODULE_6__["Component"]);
+}(react__WEBPACK_IMPORTED_MODULE_8__["Component"]); // TODOs
+// persist timer using local storage
+// since using Date as timer, can it keep 'running' when app is closed? 
 
 
+
+
+/***/ }),
+
+/***/ "./components/Modal.jsx":
+/*!******************************!*\
+  !*** ./components/Modal.jsx ***!
+  \******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Modal; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+var _jsxFileName = "/Users/jarickg/DevProjects/Sandbox/pomodoro-react/components/Modal.jsx";
+
+function Modal() {
+  var closeModal = function closeModal() {
+    var mo = document.getElementById('modal');
+    mo.style.display = 'none';
+  };
+
+  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    id: "modal",
+    style: {
+      display: 'flex'
+    },
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 11
+    },
+    __self: this
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "modal-container",
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 12
+    },
+    __self: this
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+    onClick: closeModal,
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 13
+    },
+    __self: this
+  }, '\xD7'), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "content",
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 14
+    },
+    __self: this
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h2", {
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 15
+    },
+    __self: this
+  }, "Pomodoro Clock - About"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 16
+    },
+    __self: this
+  }, "Per ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
+    href: "https://en.wikipedia.org/wiki/Pomodoro_Technique",
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 16
+    },
+    __self: this
+  }, "Wikipedia"), ", \"The Pomodoro Technique is a time management method developed by Francesco Cirillo in the late 1980s.[1] The technique uses a timer to break down work into intervals, traditionally 25 minutes in length, separated by short breaks. Each interval is known as a pomodoro, from the Italian word for 'tomato', after the tomato-shaped kitchen timer that Cirillo used as a university student.\""))));
+}
+
+/***/ }),
+
+/***/ "./components/ModalButton.jsx":
+/*!************************************!*\
+  !*** ./components/ModalButton.jsx ***!
+  \************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ModalButton; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+var _jsxFileName = "/Users/jarickg/DevProjects/Sandbox/pomodoro-react/components/ModalButton.jsx";
+
+function ModalButton() {
+  var openModal = function openModal() {
+    var mo = document.getElementById('modal');
+    mo.style.display = 'flex';
+  };
+
+  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+    className: "btn",
+    onClick: openModal,
+    id: "info",
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 12
+    },
+    __self: this
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
+    className: "material-icons",
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 13
+    },
+    __self: this
+  }, "info"));
+}
 
 /***/ }),
 
@@ -406,15 +540,48 @@ function Settings(props) {
       lineNumber: 8
     },
     __self: this
-  }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-    id: "reset",
-    onClick: props.reset,
+  }), props.devMode ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_TypeSettings__WEBPACK_IMPORTED_MODULE_1__["default"], {
+    type: "speed",
+    val: props.speed,
+    changeFunc: props.settingsChange,
     __source: {
       fileName: _jsxFileName,
       lineNumber: 9
     },
     __self: this
-  }, "Restore Defaults"));
+  }) : null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+    id: "reset",
+    onClick: props.reset,
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 11
+    },
+    __self: this
+  }, "Restore Defaults"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "checkbox-container",
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 13
+    },
+    __self: this
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
+    htmlFor: "dev-mode",
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 14
+    },
+    __self: this
+  }, "Dev Mode"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+    name: "dev-mode",
+    type: "checkbox",
+    onChange: props.toggleMode,
+    checked: props.devMode,
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 15
+    },
+    __self: this
+  })));
 }
 
 /***/ }),
@@ -434,25 +601,33 @@ __webpack_require__.r(__webpack_exports__);
 var _jsxFileName = "/Users/jarickg/DevProjects/Sandbox/pomodoro-react/components/TypeSettings.jsx";
 
 function TypeSettings(props) {
-  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "type-settings",
+  var label = props.type == 'speed' ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
+    id: props.type + '-label',
     __source: {
       fileName: _jsxFileName,
       lineNumber: 4
     },
     __self: this
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
+  }, props.type) : react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
     id: props.type + '-label',
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 5
+      lineNumber: 6
     },
     __self: this
-  }, props.type + ' length'), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+  }, props.type + ' length');
+  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "type-settings",
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 10
+    },
+    __self: this
+  }, label, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "inc-dec",
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 6
+      lineNumber: 12
     },
     __self: this
   }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
@@ -465,14 +640,14 @@ function TypeSettings(props) {
     value: "-",
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 7
+      lineNumber: 13
     },
     __self: this
   }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     id: props.type + '-length',
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 8
+      lineNumber: 14
     },
     __self: this
   }, props.val), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
@@ -485,7 +660,7 @@ function TypeSettings(props) {
     value: "+",
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 9
+      lineNumber: 15
     },
     __self: this
   })));
@@ -506,13 +681,10 @@ __webpack_require__.r(__webpack_exports__);
   Accurate_Interval.js by Squeege and modified by Peter Weinberg
   https://codepen.io/no_stack_dub_sack/pen/VKJGKd?editors=1010 
 */
-var Timer = new Object();
-
-Timer.accurateInterval = function (fn, time) {
+function accurateInterval(fn, time) {
   var cancel, nextAt, timeout, _wrapper;
 
   nextAt = new Date().getTime() + time;
-  timeout = null;
 
   _wrapper = function wrapper() {
     nextAt += time;
@@ -528,9 +700,9 @@ Timer.accurateInterval = function (fn, time) {
   return {
     cancel: cancel
   };
-};
+}
 
-/* harmony default export */ __webpack_exports__["default"] = (Timer);
+/* harmony default export */ __webpack_exports__["default"] = (accurateInterval);
 
 /***/ }),
 
@@ -747,6 +919,36 @@ function _createClass(Constructor, protoProps, staticProps) {
   if (protoProps) _defineProperties(Constructor.prototype, protoProps);
   if (staticProps) _defineProperties(Constructor, staticProps);
   return Constructor;
+}
+
+/***/ }),
+
+/***/ "./node_modules/@babel/runtime-corejs2/helpers/esm/defineProperty.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/@babel/runtime-corejs2/helpers/esm/defineProperty.js ***!
+  \***************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return _defineProperty; });
+/* harmony import */ var _core_js_object_define_property__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../core-js/object/define-property */ "./node_modules/@babel/runtime-corejs2/core-js/object/define-property.js");
+/* harmony import */ var _core_js_object_define_property__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_core_js_object_define_property__WEBPACK_IMPORTED_MODULE_0__);
+
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    _core_js_object_define_property__WEBPACK_IMPORTED_MODULE_0___default()(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
 }
 
 /***/ }),
@@ -4077,12 +4279,41 @@ function Home() {
       lineNumber: 10
     },
     __self: this
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("link", {
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("meta", {
+    charSet: "utf-8",
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 11
+    },
+    __self: this
+  }), ">", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("meta", {
+    httpEquiv: "X-UA-Compatible",
+    content: "IE=edge",
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 12
+    },
+    __self: this
+  }), ">", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("title", {
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 13
+    },
+    __self: this
+  }, "Pomodoro"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("meta", {
+    name: "viewport",
+    content: "width=device-width, initial-scale=1",
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 14
+    },
+    __self: this
+  }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("link", {
     href: "https://fonts.googleapis.com/css?family=IBM+Plex+Mono|IBM+Plex+Sans:200,400,500",
     rel: "stylesheet",
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 11
+      lineNumber: 15
     },
     __self: this
   }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("link", {
@@ -4090,20 +4321,20 @@ function Home() {
     rel: "stylesheet",
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 12
+      lineNumber: 16
     },
     __self: this
   })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     id: "root",
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 14
+      lineNumber: 18
     },
     __self: this
   }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_Clock__WEBPACK_IMPORTED_MODULE_2__["default"], {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 15
+      lineNumber: 19
     },
     __self: this
   })));
