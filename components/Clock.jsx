@@ -19,7 +19,7 @@ export default class Clock extends Component {
       timer: '',
       isActive: false,
       speed: 1,
-      devMode: true
+      devMode: false
     }
 
   }
