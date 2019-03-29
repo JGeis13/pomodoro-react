@@ -201,7 +201,7 @@ function (_Component) {
       timer: '',
       isActive: false,
       speed: 1,
-      devMode: true
+      devMode: false
     };
     return _this;
   } // Lifecycle Hooks
@@ -396,7 +396,7 @@ function Modal() {
   return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     id: "modal",
     style: {
-      display: 'flex'
+      display: 'none'
     },
     __source: {
       fileName: _jsxFileName,
